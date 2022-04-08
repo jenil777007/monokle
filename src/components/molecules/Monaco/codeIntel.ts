@@ -9,6 +9,8 @@ import {isUnsatisfiedRef} from '@redux/services/resourceRefs';
 
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
+import {runTrivy} from '@utils/trivy';
+
 import {getIncomingRefMappers, getRegisteredKindHandlers} from '@src/kindhandlers';
 
 import {GlyphDecorationTypes, InlineDecorationTypes} from './editorConstants';
@@ -139,6 +141,9 @@ export async function applyForResource(
   const newDisposables: monaco.IDisposable[] = [];
 
   if (model) {
+    const root = '/Users/wito/Code/resources/argo-cd/manifests';
+    const trivy = await runTrivy(`${root}${resource.filePath}`);
+    console.log('TRIVY', trivy);
     await processSymbols(model, resource, filterResources, newDisposables, newDecorations);
   }
 
