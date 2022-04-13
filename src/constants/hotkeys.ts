@@ -18,6 +18,7 @@ const hotkeys = {
   OPEN_EXPLORER_TAB: 'ctrl+shift+e, command+shift+e',
   OPEN_KUSTOMIZATION_TAB: 'ctrl+shift+k, command+shift+k',
   OPEN_HELM_TAB: 'ctrl+shift+h, command+shift+h',
+  OPEN_SCANNING_TAB: 'ctrl+shift+s, command+shift+s',
   RESET_RESOURCE_FILTERS: 'ctrl+alt+r, command+alt+r',
   OPEN_QUICK_SEARCH: 'ctrl+p, ctrl+shift+p, command+p, command+shift+p',
   OPEN_GETTING_STARTED_PAGE: 'ctrl+shift+t, command+shift+t',

@@ -43,7 +43,8 @@ export const updateResource = createAsyncThunk(
             resourceIds,
             currentResourceMap,
             fileMap,
-            mainState.resourceRefsProcessingOptions
+            mainState.resourceRefsProcessingOptions,
+            {trivy: mainState.trivy}
           );
           if (!preventSelectionAndHighlightsUpdate) {
             resource.isSelected = false;

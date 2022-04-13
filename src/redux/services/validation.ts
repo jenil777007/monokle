@@ -5,6 +5,9 @@ import {K8sResource, RefPosition, ResourceValidationError} from '@models/k8sreso
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {getLineCounter, getParsedDoc} from '@redux/services/resource';
+import {TrivyItem} from '@redux/thunks/runTrivy';
+
+import {mapToResourceValidationError} from '@utils/trivy';
 
 import {getResourceSchema} from './schema';
 
@@ -42,7 +45,12 @@ function getErrorPosition(valueNode: ParsedNode, lineCounter: LineCounter | unde
   };
 }
 
-export function validateResource(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+export function validateResource(
+  resource: K8sResource,
+  schemaVersion: string,
+  userDataDir: string,
+  trivy?: TrivyItem[]
+) {
   if (isKustomizationPatch(resource)) {
     return;
   }
@@ -121,6 +129,19 @@ export function validateResource(resource: K8sResource, schemaVersion: string, u
           return error;
         })
     );
+  }
+
+  // HACK: include Trivy errors
+  if (trivy) {
+    trivy.forEach(item => {
+      const trivyErrors = item.violations
+        .filter(violation =>
+          violation.locations.find(loc => loc.logicalLocation?.find(l => l.decoratedName === resource.id))
+        )
+        .map(mapToResourceValidationError);
+
+      errors.push(...trivyErrors);
+    });
   }
 
   errors.sort(compareErrorsByLineNumber);

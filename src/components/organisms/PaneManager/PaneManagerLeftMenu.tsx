@@ -175,6 +175,29 @@ const PaneManagerLeftMenu: React.FC = () => {
           />
         </MenuButton>
       </Tooltip>
+
+      <Tooltip
+        mouseEnterDelay={TOOLTIP_DELAY}
+        title={
+          leftMenuSelection === 'scanning-pane' && leftActive ? 'Hide Resource Scanning' : 'View Resource Scanning'
+        }
+        placement="right"
+      >
+        <MenuButton
+          id="scanning-pane"
+          isSelected={Boolean(activeProject) && leftMenuSelection === 'scanning-pane'}
+          isActive={Boolean(activeProject) && leftActive}
+          onClick={() => setLeftActiveMenu('scanning-pane')}
+          sectionNames={['scanning']}
+          disabled={!activeProject}
+        >
+          <MenuIcon
+            iconName="kubernetes"
+            active={Boolean(activeProject) && leftActive}
+            isSelected={Boolean(activeProject) && leftMenuSelection === 'scanning-pane'}
+          />
+        </MenuButton>
+      </Tooltip>
     </S.Container>
   );
 };

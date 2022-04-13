@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Badge, Button, Tooltip} from 'antd';
+import {Badge, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip, PluginDrawerTooltip, SettingsTooltip} from '@constants/tooltips';
@@ -14,7 +14,6 @@ import {openPluginsDrawer} from '@redux/reducers/extension';
 import {setLayoutSize, toggleNotifications, toggleSettings, toggleStartProjectPane} from '@redux/reducers/ui';
 import {activeResourcesSelector, isInPreviewModeSelector, kubeConfigContextSelector} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
-import {runTrivy} from '@redux/thunks/runTrivy';
 
 import MonokleKubeshopLogo from '@assets/MonokleLogoDark.svg';
 
@@ -114,10 +113,6 @@ const PageHeader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageHeaderHeight]);
 
-  const handleRunTrixy = useCallback(() => {
-    dispatch(runTrivy());
-  }, [dispatch, runTrivy]);
-
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
       {isInPreviewMode && previewType === 'kustomization' && (
@@ -174,9 +169,6 @@ const PageHeader = () => {
           <S.Logo id="monokle-logo-header" onClick={showGetStartingPage} src={MonokleKubeshopLogo} alt="Monokle" />
 
           <S.ProjectClusterSelectionContainer>
-            <Button onClick={handleRunTrixy} style={{width: '100px', marginRight: '10px'}}>
-              Run Trivy
-            </Button>
             <ProjectSelection />
             <ClusterSelection previewResource={previewResource} />
           </S.ProjectClusterSelectionContainer>

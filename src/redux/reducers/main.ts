@@ -39,6 +39,7 @@ import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {removeResources} from '@redux/thunks/removeResources';
 import {replaceSelectedResourceMatches} from '@redux/thunks/replaceSelectedResourceMatches';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
+import {runTrivy} from '@redux/thunks/runTrivy';
 import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
@@ -46,6 +47,7 @@ import {updateManyResources} from '@redux/thunks/updateManyResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import electronStore from '@utils/electronStore';
+import {isDefined} from '@utils/filter';
 import {makeResourceNameKindNamespaceIdentifier} from '@utils/resources';
 import {DIFF, trackEvent} from '@utils/telemetry';
 import {parseYamlDocument} from '@utils/yaml';
@@ -60,7 +62,7 @@ import {
   recalculateResourceRanges,
   saveResource,
 } from '../services/resource';
-import {updateSelectionAndHighlights} from '../services/selection';
+import {clearResourceSelections, highlightResource, updateSelectionAndHighlights} from '../services/selection';
 import {setAlert} from './alert';
 import {closeClusterDiff} from './ui';
 
@@ -244,6 +246,7 @@ export const reprocessResource = createAsyncThunk(
         {
           resourceIds: [resource.id],
           resourceKinds,
+          trivy: state.main.trivy,
         }
       );
     });
@@ -604,6 +607,29 @@ export const mainSlice = createSlice({
         previewConfigurationId: undefined,
       };
     },
+    selectTrivyRule: (state: Draft<AppState>, action: PayloadAction<{ruleId: string}>) => {
+      const rule = state.trivy?.find(item => item.id === action.payload.ruleId);
+      const resourceMap = state.resourceMap;
+
+      if (!rule) {
+        return;
+      }
+
+      state.trivy?.forEach(item => {
+        item.isSelected = false;
+      });
+      rule.isSelected = true;
+
+      clearResourceSelections(resourceMap);
+      rule.violations
+        .flatMap(violation => {
+          return violation.locations.flatMap(location => {
+            return location.logicalLocation?.flatMap(l => l.decoratedName);
+          });
+        })
+        .filter(isDefined)
+        .forEach(resource => highlightResource(resourceMap, resource));
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -723,6 +749,7 @@ export const mainSlice = createSlice({
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
+      state.trivy = undefined;
       state.previewLoader.isLoading = false;
       state.previewLoader.targetId = undefined;
       state.selectedResourceId = undefined;
@@ -1010,6 +1037,10 @@ export const mainSlice = createSlice({
       return action.payload;
     });
 
+    builder.addCase(runTrivy.fulfilled, (state, action) => {
+      state.trivy = action.payload;
+    });
+
     builder.addMatcher(
       () => true,
       (state, action) => {
@@ -1126,5 +1157,6 @@ export const {
   openPreviewConfigurationEditor,
   closePreviewConfigurationEditor,
   selectPreviewConfiguration,
+  selectTrivyRule,
 } = mainSlice.actions;
 export default mainSlice.reducer;

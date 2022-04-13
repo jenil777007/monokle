@@ -23,6 +23,7 @@ import {K8sResource, RefPosition, ResourceRefType} from '@models/k8sresource';
 import {getAbsoluteResourcePath, getResourcesForPath} from '@redux/services/fileEntry';
 import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
 import {clearRefNodesCache, isUnsatisfiedRef, refMapperMatchesKind} from '@redux/services/resourceRefs';
+import {TrivyItem} from '@redux/thunks/runTrivy';
 
 import {getFileTimestamp} from '@utils/files';
 import {createKubeClient} from '@utils/kubeclient';
@@ -453,6 +454,7 @@ export function reprocessResources(
   processingOptions: ResourceRefsProcessingOptions,
   options?: {
     resourceKinds?: string[];
+    trivy?: TrivyItem[];
   }
 ) {
   if (resourceIds.length === 0) {
@@ -499,6 +501,7 @@ export function reprocessResources(
   processResources(schemaVersion, userDataDir, resourceMap, processingOptions, {
     resourceIds,
     resourceKinds: resourceKindsToReprocess,
+    trivy: options?.trivy,
   });
 
   // always reprocess kustomizations - kustomization refs to updated resources may need to be recreated
@@ -514,14 +517,14 @@ export function processResources(
   userHomeDir: string,
   resourceMap: ResourceMapType,
   processingOptions: ResourceRefsProcessingOptions,
-  options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean}
+  options?: {resourceIds?: string[]; resourceKinds?: string[]; skipValidation?: boolean; trivy?: TrivyItem[]}
 ) {
   if (!options?.skipValidation) {
     if (options && options.resourceIds && options.resourceIds.length > 0) {
       Object.values(resourceMap)
         .filter(r => options.resourceIds?.includes(r.id))
         .forEach(resource => {
-          validateResource(resource, schemaVersion, userHomeDir);
+          validateResource(resource, schemaVersion, userHomeDir, options.trivy);
         });
     }
 

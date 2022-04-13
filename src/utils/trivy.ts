@@ -1,3 +1,5 @@
+import {ResourceValidationError} from '@models/k8sresource';
+
 import {CommandOptions, runCommandInMainThread} from './command';
 
 export type SarifRule = {
@@ -23,6 +25,13 @@ export type SarifRule = {
   };
 };
 
+export type LogicalLocation = {
+  kind: 'resource';
+  name: string; // resource.name
+  decoratedName: string; // resource.id
+  fullyQualifiedName: string; // ${kind}.${namespace}.${resourceName}
+};
+
 export type SarifResult = {
   ruleId: string;
   ruleIndex: number;
@@ -31,7 +40,7 @@ export type SarifResult = {
     text: string;
   };
   locations: Array<{
-    physicalLocation: {
+    physicalLocation?: {
       artifactLocation: {
         uri: string; // filepath
         uriBaseId: string;
@@ -40,24 +49,27 @@ export type SarifResult = {
         startLine: number;
       };
     };
+    logicalLocation?: LogicalLocation[];
   }>;
+};
+
+export type SarifRun = {
+  tool: {
+    driver: {
+      name: string;
+      version: string;
+      fullName: string;
+      informationUri: string;
+      rules: SarifRule[];
+    };
+  };
+  results: SarifResult[];
 };
 
 export type SarifOutput = {
   version: string;
   $schema: string;
-  runs: Array<{
-    tool: {
-      driver: {
-        name: string;
-        version: string;
-        fullName: string;
-        informationUri: string;
-        rules: SarifRule[];
-      };
-      results: SarifResult[];
-    };
-  }>;
+  runs: SarifRun[];
 };
 
 export function buildTrivyCommand(filePath: string): string[] {
@@ -87,4 +99,17 @@ export async function runTrivy(filePath: string): Promise<SarifOutput> {
 
   console.log('TRIVY RAW', result.stdout);
   return createTrivyResult(result.stdout);
+}
+
+export function mapToResourceValidationError(violation: SarifResult): ResourceValidationError {
+  return {
+    property: 'no property available',
+    message: violation.ruleId,
+    description: violation.message.text,
+    errorPos: {
+      line: 1,
+      column: 0,
+      length: 1,
+    },
+  };
 }

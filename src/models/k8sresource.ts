@@ -90,4 +90,10 @@ interface RefPosition {
   length: number;
 }
 
+export function getFullyQualifiedResourceName(resource: K8sResource): string {
+  return resource.namespace
+    ? `${resource.kind}.${resource.namespace}.${resource.name}`
+    : `${resource.kind}.${resource.name}`;
+}
+
 export type {K8sResource, ResourceRef, RefPosition, ResourceValidation, ResourceValidationError};

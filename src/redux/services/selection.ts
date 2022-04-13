@@ -39,7 +39,7 @@ export function highlightChildrenResources(fileEntry: FileEntry, resourceMap: Re
     });
 }
 
-function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
+export function highlightResource(resourceMap: ResourceMapType, resourceId: string) {
   const currentResource = resourceMap[resourceId];
   if (currentResource) {
     currentResource.isHighlighted = true;

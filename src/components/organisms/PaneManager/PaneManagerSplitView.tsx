@@ -8,6 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration} from '@redux/reducers/ui';
 
 import {ActionsPane, NavigatorPane} from '@organisms';
+import ScanningPane from '@organisms/ScanningPane';
 
 import {GraphView} from '@components/molecules';
 
@@ -21,6 +22,7 @@ const FileTreePane = React.lazy(() => import('@organisms/FileTreePane'));
 const HelmPane = React.lazy(() => import('@organisms/HelmPane'));
 const KustomizePane = React.lazy(() => import('@organisms/KustomizePane'));
 const TemplateManagerPane = React.lazy(() => import('@organisms/TemplateManagerPane'));
+const ResourceScanningPane = React.lazy(() => import('@organisms/ScanningPane'));
 
 const PaneManagerSplitView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -119,6 +121,7 @@ const PaneManagerSplitView: React.FC = () => {
                 {leftMenuSelection === 'helm-pane' && <HelmPane />}
                 {leftMenuSelection === 'kustomize-pane' && <KustomizePane />}
                 {leftMenuSelection === 'templates-pane' && <TemplateManagerPane contentHeight={paneHeight} />}
+                {leftMenuSelection === 'scanning-pane' && <ScanningPane />}
               </Suspense>
             </S.Pane>
           </ResizableBox>

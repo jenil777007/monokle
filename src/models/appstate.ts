@@ -1,5 +1,7 @@
 import {HelmChart, HelmValuesFile} from '@models/helm';
 
+import {LeftPanelInput} from '@redux/thunks/runTrivy';
+
 import {AlertType} from './alert';
 import {FileEntry} from './fileentry';
 import {K8sResource} from './k8sresource';
@@ -144,6 +146,7 @@ interface AppState {
     refreshDiffResource?: boolean;
     selectedMatches: string[];
   };
+  trivy?: LeftPanelInput;
   notifications: AlertType[];
   /** whether or not the editor should read the selectedPath file again - used when the file is updated externally */
   shouldEditorReloadSelectedPath: boolean;

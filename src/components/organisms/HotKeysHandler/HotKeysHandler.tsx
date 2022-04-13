@@ -240,6 +240,10 @@ const HotKeysHandler = () => {
     dispatch(setLeftMenuSelection('helm-pane'));
   });
 
+  useHotkeys(hotkeys.OPEN_SCANNING_TAB, () => {
+    dispatch(setLeftMenuSelection('scanning-pane'));
+  });
+
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS, () => {
     dispatch(resetResourceFilter());
   });

@@ -163,6 +163,10 @@ function SectionRenderer(props: SectionRendererProps) {
     [groupInstanceById]
   );
 
+  // if (sectionInstance?.id === 'trivy') {
+  //   console.log('render', sectionInstance);
+  // }
+
   if (!sectionInstance?.isInitialized && sectionBlueprint.customization?.beforeInitializationText) {
     return (
       <S.BeforeInitializationContainer level={level}>
