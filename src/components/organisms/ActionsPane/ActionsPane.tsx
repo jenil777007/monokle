@@ -61,7 +61,6 @@ import {Icon, TabHeader} from '@atoms';
 
 import WalkThrough from '@components/molecules/WalkThrough';
 
-import {useMainPaneHeight} from '@utils/hooks';
 import {openExternalResourceKindDocumentation} from '@utils/shell';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -72,7 +71,11 @@ import * as S from './ActionsPane.styled';
 
 const {TabPane} = Tabs;
 
-const ActionsPane: React.FC = () => {
+type Props = {
+  height: number;
+};
+
+const ActionsPane: React.FC<Props> = ({height}) => {
   const dispatch = useAppDispatch();
   const applyingResource = useAppSelector(state => state.main.isApplyingResource);
   const currentSelectionHistoryIndex = useAppSelector(state => state.main.currentSelectionHistoryIndex);
@@ -110,7 +113,6 @@ const ActionsPane: React.FC = () => {
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
-  const paneHeight = useMainPaneHeight();
 
   // Could not get the ref of Tabs Component
   const tabsList = document.getElementsByClassName('ant-tabs-nav-list');
@@ -449,7 +451,7 @@ const ActionsPane: React.FC = () => {
         </TitleBar>
       )}
 
-      <ReflexContainer orientation="horizontal" style={{height: paneHeight - 40}}>
+      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
         <ReflexElement flex={1.0}>
           {!selectedPreviewConfigurationId ? (
             <S.Tabs
